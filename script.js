@@ -18,35 +18,12 @@ let animationFrameId = null;
 // Update high score display
 document.getElementById('highscore').textContent = highScore;
 
-// Load player sprite sheet
-const playerSpriteSheet = new Image();
-playerSpriteSheet.src = 'Gemini_Generated_Image_uv3my3uv3my3uv3m.png';
+// Load player GIF animation
+const playerGif = new Image();
+playerGif.src = 'yasuo.gif';
 let imageLoaded = false;
-playerSpriteSheet.onload = () => {
+playerGif.onload = () => {
     imageLoaded = true;
-    // Redraw initial screen
-    drawBackground();
-    player.draw();
-};
-
-// Sprite animation config
-const spriteConfig = {
-    frameWidth: 0,  // Will be calculated after image loads
-    frameHeight: 0,
-    cols: 3,
-    rows: 2,
-    totalFrames: 6,
-    currentFrame: 0,
-    frameCounter: 0,
-    frameSpeed: 8,  // Higher = slower animation
-    jumpFrameSpeed: 4  // Faster animation when jumping
-};
-
-// Calculate sprite dimensions once image loads
-playerSpriteSheet.onload = () => {
-    imageLoaded = true;
-    spriteConfig.frameWidth = playerSpriteSheet.width / spriteConfig.cols;
-    spriteConfig.frameHeight = playerSpriteSheet.height / spriteConfig.rows;
     // Redraw initial screen
     drawBackground();
     player.draw();
@@ -65,30 +42,11 @@ const player = {
     isJumping: false,
     color: '#00d9ff',
     draw() {
-        // Draw sprite animation if loaded, otherwise draw placeholder
+        // Draw GIF animation if loaded, otherwise draw placeholder
         if (imageLoaded) {
-            // Calculate which frame to show
-            const frameSpeed = this.isJumping ? spriteConfig.jumpFrameSpeed : spriteConfig.frameSpeed;
-
-            spriteConfig.frameCounter++;
-            if (spriteConfig.frameCounter >= frameSpeed) {
-                spriteConfig.frameCounter = 0;
-                spriteConfig.currentFrame = (spriteConfig.currentFrame + 1) % spriteConfig.totalFrames;
-            }
-
-            // Calculate source position in sprite sheet
-            const col = spriteConfig.currentFrame % spriteConfig.cols;
-            const row = Math.floor(spriteConfig.currentFrame / spriteConfig.cols);
-            const sx = col * spriteConfig.frameWidth;
-            const sy = row * spriteConfig.frameHeight;
-
-            // Ensure full opacity
-            ctx.globalAlpha = 1.0;
-
-            // Method 1: Draw with compositing to remove transparency
             ctx.save();
 
-            // Draw a solid background circle/rectangle behind sprite
+            // Draw a solid background circle behind sprite
             ctx.fillStyle = '#1a2f4f';
             ctx.beginPath();
             ctx.arc(this.x + this.width/2, this.y + this.height/2, this.width/2 + 5, 0, Math.PI * 2);
@@ -98,13 +56,11 @@ const player = {
             ctx.shadowBlur = 25;
             ctx.shadowColor = '#00d9ff';
 
-            // Draw current frame from sprite sheet
+            // Draw GIF (it will animate automatically)
             ctx.drawImage(
-                playerSpriteSheet,
-                sx, sy,  // Source x, y
-                spriteConfig.frameWidth, spriteConfig.frameHeight,  // Source width, height
-                this.x, this.y,  // Destination x, y
-                this.width, this.height  // Destination width, height
+                playerGif,
+                this.x, this.y,
+                this.width, this.height
             );
 
             ctx.restore();
@@ -116,9 +72,6 @@ const player = {
                 ctx.fillRect(this.x - 20, this.y + 20, 15, 40);
                 ctx.fillRect(this.x - 35, this.y + 25, 15, 30);
             }
-
-            // Reset global alpha
-            ctx.globalAlpha = 1.0;
         } else {
             // Fallback: draw simple shape
             ctx.fillStyle = this.color;
@@ -156,20 +109,20 @@ const player = {
     }
 };
 
-// Load obstacle images
+// Load obstacle GIF animations
 const obstacleImages = {};
 const obstacleImagePaths = {
-    'leesin': 'assets/leesin/leesin.png',
-    'lux': 'assets/lux/lux.png',
-    'blitzcrank': 'assets/blitzcrank/blitzcrank.png',
-    'thresh': 'assets/thresh/thresh.png',
-    'zed': 'assets/zed/zed.png'
+    'leesin': 'assets/leesin/leesin.gif',
+    'lux': 'assets/lux/lux.gif',
+    'blitzcrank': 'assets/blitzcrank/blitzcrank.gif',
+    'thresh': 'assets/thresh/thresh.gif',
+    'zed': 'assets/zed/zed.gif'
 };
 
 let obstacleImagesLoaded = 0;
 const totalObstacleImages = Object.keys(obstacleImagePaths).length;
 
-// Load all obstacle images
+// Load all obstacle GIF animations
 Object.keys(obstacleImagePaths).forEach(key => {
     const img = new Image();
     img.src = obstacleImagePaths[key];
@@ -188,7 +141,6 @@ const obstacleTypes = [
         width: 70,
         height: 70,
         yPosition: 'middle', // 'ground', 'middle', 'high'
-        spriteFrame: 0, // Which frame to show (0-5)
     },
     {
         name: '✨ Lux Q',
@@ -197,7 +149,6 @@ const obstacleTypes = [
         width: 70,
         height: 70,
         yPosition: 'high',
-        spriteFrame: 1,
     },
     {
         name: '⚡ Blitz Hook',
@@ -206,7 +157,6 @@ const obstacleTypes = [
         width: 70,
         height: 70,
         yPosition: 'middle',
-        spriteFrame: 2,
     },
     {
         name: '⛓️ Thresh Q',
@@ -215,7 +165,6 @@ const obstacleTypes = [
         width: 70,
         height: 70,
         yPosition: 'ground',
-        spriteFrame: 3,
     },
     {
         name: '🌀 Zed Shadow',
@@ -224,7 +173,6 @@ const obstacleTypes = [
         width: 70,
         height: 70,
         yPosition: 'high',
-        spriteFrame: 4,
     }
 ];
 
@@ -258,7 +206,6 @@ function createObstacle() {
         color: type.color,
         name: type.name,
         imageKey: type.imageKey,
-        spriteFrame: type.spriteFrame,
         passed: false
     });
 }
@@ -268,19 +215,7 @@ function drawObstacles() {
     obstacles.forEach(obstacle => {
         const img = obstacleImages[obstacle.imageKey];
 
-        if (img && img.complete) {
-            // Calculate sprite sheet frame position (3x2 grid)
-            const cols = 3;
-            const rows = 2;
-            const frameWidth = img.width / cols;
-            const frameHeight = img.height / rows;
-
-            const frameIndex = obstacle.spriteFrame % 6; // 0-5
-            const col = frameIndex % cols;
-            const row = Math.floor(frameIndex / cols);
-            const sx = col * frameWidth;
-            const sy = row * frameHeight;
-
+        if (img && img.complete && img.naturalWidth > 0) {
             ctx.save();
 
             // Draw background circle for visibility
@@ -295,11 +230,9 @@ function drawObstacles() {
             ctx.shadowBlur = 15;
             ctx.shadowColor = obstacle.color;
 
-            // Draw sprite frame
+            // Draw GIF (it will animate automatically)
             ctx.drawImage(
                 img,
-                sx, sy,
-                frameWidth, frameHeight,
                 obstacle.x, obstacle.y,
                 obstacle.width, obstacle.height
             );
