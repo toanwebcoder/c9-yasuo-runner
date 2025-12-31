@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C9 Yasuo Runner - Cloud9 League Challenge</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <h1>⚡ C9 YASUO RUNNER</h1>
+                <p class="subtitle">Cloud9 League of Legends Challenge</p>
+            </div>
+            <div class="header-controls">
+                <button id="homeBtn" class="btn-home" style="display: none;">🏠 HOME</button>
+                <button id="pauseBtn" class="btn-pause" style="display: none;">⏸️ PAUSE</button>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">ĐIỂM SỐ</span>
+                    <span class="stat-value" id="score">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">KỶ LỤC</span>
+                    <span class="stat-value" id="highscore">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">TỐC ĐỘ</span>
+                    <span class="stat-value" id="speed">1.0x</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Canvas -->
+        <div class="game-wrapper">
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- Pause Screen -->
+            <div id="pauseScreen" class="pause-screen hidden">
+                <div class="pause-content">
+                    <h2>⏸️ TẠM DỪNG</h2>
+                    <div class="pause-stats">
+                        <p>Điểm hiện tại: <span id="pauseScore">0</span></p>
+                        <p>Chướng ngại vật: <span id="pauseObstacles">0</span></p>
+                        <p>Tốc độ: <span id="pauseSpeed">1.0x</span></p>
+                    </div>
+                    <div class="pause-buttons">
+                        <button id="resumeBtn" class="btn-primary">▶️ TIẾP TỤC</button>
+                        <button id="pauseHomeBtn" class="btn-secondary">🏠 VỀ TRANG CHỦ</button>
+                    </div>
+                    <p class="pause-hint">💡 Nhấn ESC để tiếp tục</p>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="gameOver" class="game-over hidden">
+                <div class="game-over-content">
+                    <h2>💀 DEFEATED!</h2>
+                    <p class="final-score">Điểm: <span id="finalScore">0</span></p>
+                    <p class="obstacle-hit">Bị đánh bởi: <span id="obstacleHit">Unknown</span></p>
+                    <button id="restartBtn" class="btn-primary">⚔️ CHIẾN TIẾP</button>
+                </div>
+            </div>
+
+            <!-- Start Screen -->
+            <div id="startScreen" class="start-screen">
+                <div class="start-content">
+                    <h2>⚡ C9 YASUO RUNNER ⚡</h2>
+                    <div class="character-showcase">
+                        <div class="character-card">
+                            <div class="sprite-container">
+                                <img src="Gemini_Generated_Image_uv3my3uv3my3uv3m.png" alt="Yasuo" class="character-icon-img">
+                            </div>
+                            <div>
+                                <h3>C9 YASUO</h3>
+                                <p class="character-role">The Wind Warrior</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h3>🎮 CÁCH CHƠI</h3>
+                        <ul>
+                            <li><strong>CLICK CHUỘT TRÁI:</strong> Yasuo dash lên cao</li>
+                            <li><strong>GIỮ CHUỘT:</strong> Bay lâu hơn</li>
+                            <li><strong>MỤC TIÊU:</strong> Tránh skill của địch thủ</li>
+                        </ul>
+                        <div class="enemies-info">
+                            <h4>⚠️ CHƯỚNG NGẠI VẬT</h4>
+                            <div class="enemy-list">
+                                <span class="enemy-tag lee">🥋 Lee Sin - Nộ Long Cước</span>
+                                <span class="enemy-tag lux">✨ Lux - Light Binding</span>
+                                <span class="enemy-tag blitz">⚡ Blitzcrank - Rocket Grab</span>
+                                <span class="enemy-tag thresh">⛓️ Thresh - Death Sentence</span>
+                                <span class="enemy-tag zed">🌀 Zed - Shadow Slash</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="startBtn" class="btn-primary btn-large">⚔️ BẮT ĐẦU TRẬN ĐẤU</button>
+                    <p class="credits">🏆 Inspired by Cloud9 Esports Legacy 🏆</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <div class="c9-info">
+                <h3>🏆 CLOUD9 LEGENDS</h3>
+                <div class="legends-grid">
+                    <div class="legend-card">
+                        <strong>Sneaky</strong>
+                        <span>ADC Legend</span>
+                    </div>
+                    <div class="legend-card">
+                        <strong>Jensen</strong>
+                        <span>Mid Dynasty</span>
+                    </div>
+                    <div class="legend-card">
+                        <strong>Impact</strong>
+                        <span>Top Tank</span>
+                    </div>
+                    <div class="legend-card">
+                        <strong>Svenskeren</strong>
+                        <span>Jungle King</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tips">
+                <h4>💡 MẸO CHƠI</h4>
+                <p>🔥 Click liên tục để duy trì độ cao</p>
+                <p>⚡ Tốc độ tăng dần theo thời gian</p>
+                <p>🎯 Mỗi chướng ngại vật tránh được +10 điểm</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
